@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="easeljs-0.7.1.min.js"></script>
+	<script type="text/javascript">
+		var canvas;
+		var stage;
+		var logo;
+		var img;
+		var text;
+
+		function init() {
+			canvas = document.getElementById("game");
+			stage = new createjs.Stage(canvas);
+
+			text = new createjs.Text("Text rendered!!!! ON CANVAS HELLO YOU", "36px Arial", "#666");
+			text.x = 100;
+			text.y = 100;
+
+			img = new Image();
+			img.src = "assests/cat.gif";
+			img.onload  = setImg;
+			
+		}
+
+		function setImg(event){
+			logo = new createjs.Bitmap(img);
+			logo.x = canvas.width - 400;
+			logo.y = canvas.height/2 - 100;
+
+			stage.addChild(logo);
+			stage.addChild(text);
+			stage.update();
+		}
+		//window.onload = function () {
+		    // socket.on('temps', function (data) {
+		    // });
+			//setInterval(function(){updateChart()}, 500); 
+		//}
+	</script>
+</head>
+<body onLoad="init()">
+	<canvas id="game" width="960" height="580"></canvas>
+</body>
+</html>
