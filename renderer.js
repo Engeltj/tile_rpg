@@ -292,7 +292,12 @@ function tick(event){
 	lap = lookAheadPosition();
 	//console.log(lap);
 	var tileIds = getTileIdsFromPosition(lap)
+	
 	for (var i in tileIds){
+		if (isNaN(tileIds[i]) || tileIds[i] == 174){
+			collide = true;
+			break
+		}
 		if (hasProperties(tileIds[i])){
 			if(check_collide(tileIds[i]))
 				collide = true;
@@ -361,11 +366,13 @@ function tick(event){
 			}
 		}
 		var xy = getXY();
-		var index = getIsoXYFromPosition(xy).y+1;
-		var index2 = xy.y/32+1;
+		var xy_iso = getIsoXYFromPosition(xy);
+		var index = xy_iso.y+1;
+		var index2 = 0;
 		if (index2 > index)
 			index = index2;
-		console.log(index2);
+		//console.log("ISO: "+index+"   H: " + index2)
+		//console.log(index2);
 		map[2].setChildIndex(player, index)
 		//console.log(getXY().y/32)
 	}
