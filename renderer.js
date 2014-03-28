@@ -54,22 +54,24 @@ window.onload = function()
 
 	// creating EaselJS stage
 	stage = new createjs.Stage("game");
+	stage.x = mapData.height/2 * -1 * 32 - 32*8;
+	stage.y = mapData.width/2 * -1 * 16 - 16*8;
 
 	// var test1 = {1:"hello"}
 	// var test2 = {2:"world"}
 	// var test3 = Object.extend(test1, test2); 
 	// console.log(test3[2])
 
-	// var circle = new createjs.Shape();
- //    circle.graphics.beginFill("red").drawCircle(0, 0, 5);
- //    circle.x = stage.canvas.width/2;
- //    circle.y = stage.canvas.height/2;
+	var circle = new createjs.Shape();
+    circle.graphics.beginFill("red").drawCircle(0, 0, 5);
+    circle.x = stage.canvas.width/2 - stage.x;
+    circle.y = stage.canvas.height/2 - stage.y;
 
     mapContainer = new createjs.Container();
     for (var i=0;i<3;i++){
     	map[i] = new createjs.Container();
     	mapLayers[i] = {};
-    	for (var j=0;j<mapData.height+5;j++){
+    	for (var j=0;j<mapData.height*2;j++){
 	    	mapLayers[i][j] = new createjs.Container();
 	    	map[i].addChild(mapLayers[i][j]);
 	    }
@@ -100,14 +102,17 @@ window.onload = function()
 	player.regX = 39/2;
 	player.regY = 64/4;
 	player.gotoAndStop("wkDown");
-	player.x = stage.canvas.width/2;
-	player.y = stage.canvas.height/2 - 32 - 7;
+	player.x = stage.canvas.width/2  - stage.x;
+	player.y = stage.canvas.height/2 - 32  - stage.y;
 	//console.log(stage.canvas.width/2)
 	for (var key in map){
 		mapContainer.addChild(map[key]);
 	}
 	stage.addChild(mapContainer);
+	stage.addChild(circle);
 	map[2].addChild(player);
+
+	setPlayerStart({x:2,y:2})
 }
 
 // loading layers
@@ -132,11 +137,15 @@ function initLayers() {
 	tileproperties = getTileProperties(mapData.tilesets);
 	//console.log(tileproperties)
 	// loading each layer at a time
-	for (var idx = 0; idx < mapData.layers.length; idx++) {
-		var layerData = mapData.layers[idx];
-		if (layerData.type == 'tilelayer')
-			initLayer(layerData, tilesetSheet, mapData.tilewidth, mapData.tileheight, tileproperties);
-	}
+	//for (var idx = 0; idx < mapData.layers.length; idx++) {
+		//var layerData = mapData.layers[idx];
+	var layerBackground = mapData.layers[0];
+	var layerGround = mapData.layers[1];
+	initLayer(layerBackground, tilesetSheet, mapData.tilewidth, mapData.tileheight, tileproperties);
+	initLayer(layerGround, tilesetSheet, mapData.tilewidth, mapData.tileheight, tileproperties);
+		//if (layerData.type == 'tilelayer')
+			
+	//}
 	// stage updates (not really used here)
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", tick);
@@ -163,12 +172,12 @@ function initLayer(layerData, tilesetSheet, tilewidth, tileheight, tilepropertie
 			cellBitmap.x = x * tilewidth/2 - y * tilewidth/2 + layerData.height*tilewidth/2 - tileheight - 64;
 			cellBitmap.y = y * tileheight/2 + x * tileheight/2 + layerData.height*tileheight/2 + tileheight - 32;
 			
-			var variableLayer = getIsoXYFromPosition({x:cellBitmap.x, y:cellBitmap.y}).y-2//Math.round(cellBitmap.y/tileheight)-9;//getIsoXYFromPosition({x:cellBitmap.x, y:cellBitmap.y}).x-16;
-			console.log(variableLayer);
+			var variableLayer = getIsoFromCartesian({x:cellBitmap.x, y:cellBitmap.y}).y-2//Math.round(cellBitmap.y/tileheight)-9;//getIsoXYFromPosition({x:cellBitmap.x, y:cellBitmap.y}).x-16;
+			variableLayer*=2
 			var distanceFromBase = 0;
 			if (tileproperties[tileId.toString()] != null)
 				distanceFromBase = parseInt(tileproperties[tileId.toString()].base) + 1 || 1;
-			variableLayer+=distanceFromBase;
+			variableLayer+=(distanceFromBase*2);
 
 			mapLayers[layer][variableLayer].addChild(cellBitmap);
 			
@@ -228,32 +237,40 @@ function handleKeyUp(e){
 	}
 }
 
+//uses ISO
+function setPlayerStart(mapPos){
 
+	offset = getCartesianFromIso(mapPos);
+	console.log(offset);
+	mapContainer.x += offset.x*-1
+	mapContainer.y += offset.y*-1
+	player.x += offset.x;
+	player.y += offset.y;
+}
+
+//returns cartesian
 function getXY(){
 	var x = mapContainer.x*-1;
 	var y = mapContainer.y*-1;
 	return {x:x,y:y};
 }
 
-// function getIsoXY() {
-// 	var xy = getXY();
-//     return getIsoXYFromPosition(xy);
-// }
-
-function getIsoXYFromPosition(mapPos){
+function getCartesianFromIso(mapPos){
+	mapPos.x = mapPos.x*64
+    mapPos.y = mapPos.y*64
+    mapPos.x = mapPos.x - mapPos.y/2;
+    mapPos.y = mapPos.x + mapPos.y/2;
+    return mapPos;
+}
+//uses ISO
+function getIsoFromCartesian(mapPos){
 	var x = Math.round((mapPos.x + 2*mapPos.y)/64);
     var y = Math.round((2*mapPos.y - mapPos.x)/64);
     return { x : x, y : y};
 }
 
-// function testIsoXY(mapPos) {
-// 	var xy = mapPos;
-//     var x2 = Math.round((xy.x + 2*xy.y)/64);
-//     var y2 = Math.round((2*xy.y - xy.x)/64);
-//     return { x : x2, y : y2};
-// }
-
-function lookAheadPosition(){
+//returns ISO
+function getFuturePosition(){
 	var mapPos = getXY();
 	if (key_left)
 		mapPos.x -= speed_walk;
@@ -263,7 +280,7 @@ function lookAheadPosition(){
 		mapPos.y -= speed_walk/2;
 	if (key_down)
 		mapPos.y += speed_walk/2;
-	return getIsoXYFromPosition(mapPos);
+	return getIsoFromCartesian(mapPos);
 }
 
 function getTileIdsFromPosition(mapPos){
@@ -271,6 +288,7 @@ function getTileIdsFromPosition(mapPos){
 	for (var i=0;i<mapData.layers.length;i++){
 		tileIds.push(mapData.layers[i].data[mapPos.x+mapPos.y*mapData.height] - 1)
 	}
+	
 	return tileIds;
 }
 
@@ -278,31 +296,45 @@ function hasProperties(tileId){
 	return (tileproperties[tileId] != null)
 }
 
-function check_collide(tileId){
-	if (tileproperties[tileId] != null){
-		var walkable = tileproperties[tileId].walkable;
-		if (walkable != null && walkable == "0")
-			return true;
-	}
-	return false;
+function isWalkable(tileId){
+	if (tileId == 0 || tileId == NaN)
+		return false;
+	return true
+	// if (tileproperties[tileId] != null){
+	// 	if ()
+	// 	// var walkable = tileproperties[tileId].walkable;
+	// 	// if (walkable != null && walkable == "0")
+	// 	// 	return true;
+	// }
+	// return false;
 }
 
 function tick(event){
 	var collide = false;
-	lap = lookAheadPosition();
+	var lap = getFuturePosition();
 	//console.log(lap);
 	var tileIds = getTileIdsFromPosition(lap)
-	
+	//console.log(tileIds)
 	for (var i in tileIds){
-		if (isNaN(tileIds[i]) || tileIds[i] == 174){
+		if (!isWalkable(tileIds[i])){
 			collide = true;
+			//console.log(collide)
 			break
 		}
-		if (hasProperties(tileIds[i])){
-			if(check_collide(tileIds[i]))
-				collide = true;
-		}
 	}
+
+	
+	// for (var i in tileIds){
+	// 	//console.log(tileIds[i])
+	// 	if (isNaN(tileIds[i]) || tileIds[i] == 174){
+	// 		collide = true;
+	// 		break
+	// 	}
+	// 	if (hasProperties(tileIds[i])){
+	// 		if(check_collide(tileIds[i]))
+	// 			collide = true;
+	// 	}
+	// }
 	//console.log(event.delta);
 	if (!collide){
 
@@ -366,14 +398,14 @@ function tick(event){
 			}
 		}
 		var xy = getXY();
-		var xy_iso = getIsoXYFromPosition(xy);
-		var index = xy_iso.y+1;
-		var index2 = 0;
-		if (index2 > index)
-			index = index2;
+		var xy_iso = getIsoFromCartesian(xy);
+		var index = xy_iso.y+2;
+		// var index2 = 0;
+		// if (index2 > index)
+		// 	index = index2;
 		//console.log("ISO: "+index+"   H: " + index2)
 		//console.log(index2);
-		map[2].setChildIndex(player, index)
+		map[2].setChildIndex(player, index*2)
 		//console.log(getXY().y/32)
 	}
 	
@@ -410,4 +442,4 @@ Object.extend = function(destination, source) {
 
 
 // Map data created on Tiled map editor (mapeditor.org). Use export for JSON format
-var mapDataJson = httpGetData('untitled.json');
+var mapDataJson = httpGetData('map.json');
