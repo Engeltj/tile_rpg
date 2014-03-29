@@ -99,7 +99,16 @@ window.onload = function()
 		framerate: 1,
 		images: [img_actor],
 		frames: {width:39, height:64},
-		animations: {wkDown:[0,3], wkLeft:[4,7], wkRight:[8,11], wkUp:[12,15], wkDownLeft:[16,19], wkDownRight:[20,23], wkUpLeft:[24,27], wkUpRight:[28,31]}
+		animations: {
+			wkDown:[0,3, "wkDown", 1/3], 
+			wkLeft:[4,7, "wkLeft", 1/3], 
+			wkRight:[8,11, "wkRight", 1/3], 
+			wkUp:[12,15, "wkUp", 1/3], 
+			wkDownLeft:[16,19, "wkDownLeft", 1/3], 
+			wkDownRight:[20,23, "wkDownRight", 1/3], 
+			wkUpLeft:[24,27, "wkUpLeft", 1/3], 
+			wkUpRight:[28,31, "wkUpRight", 1/3]
+		}
 	});
 
 	player = new createjs.Sprite(spriteSheet);
@@ -113,7 +122,7 @@ window.onload = function()
 		mapContainer.addChild(map[key]);
 	}
 	stage.addChild(mapContainer);
-	stage.addChild(circle);
+	//stage.addChild(circle);
 	map[2].addChild(player);
 
 	setPlayerStart({x:2,y:2})
