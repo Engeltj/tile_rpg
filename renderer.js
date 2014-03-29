@@ -6,8 +6,12 @@ var key_left;
 var key_right;
 var key_up;
 var key_down;
-var keyDn=false;
-var pressed=0;
+var update_anim;
+
+
+// var keyDn=false;
+// var keys = 0;
+// var pressed=0;
 var img_actor;
 var player;
 var tileproperties = {};
@@ -200,40 +204,43 @@ function getTileProperties(tilesets){
 }
 
 
-function test(){
-	var i = 0;
-	if (key_up) i++;
-	if (key_right) i++;
-	if (key_left) i++;
-	if (key_down) i++;
-	if (i == 2)
-		keyDn=false;
-	return i;
-}
+// function test(){
+// 	var i = 0;
+// 	if (key_up) i++;
+// 	if (key_right) i++;
+// 	if (key_left) i++;
+// 	if (key_down) i++;
+// 	if (i == 2)
+// 		keyDn=false;
+// 	return i;
+// }
 
+function test2(){
+
+}
 
 function handleKeyDown(e){
 	if (!e){var e = window.event;}
-	if (test() > pressed){
-		pressed = test();
-		//keyDn=false;
-	}
+	// if (test() > pressed){
+	// 	pressed = test();
+	// 	//keyDn=false;
+	// }
 
 	switch(e.keyCode){
-		case 37: key_right=false;key_left=true; test(); break; //left
-		case 38: key_up=true;key_down=false; test(); break; //up
-		case 39: key_right=true;key_left=false;test(); break; //right
-		case 40: key_up=false;key_down=true; test();break; //down
+		case 37: if(!key_left){key_right=false;key_left=true; update_anim=true;} break; //left
+		case 38: if(!key_up){key_up=true;key_down=false; update_anim=true;} break; //up
+		case 39: if(!key_right){key_right=true;key_left=false; update_anim=true;} break; //right
+		case 40: if(!key_down){key_up=false;key_down=true; update_anim=true;} break; //down
 	}
 }
 
 function handleKeyUp(e){
 	if (!e){var e = window.event;}
 	switch(e.keyCode){
-		case 37: player.gotoAndStop("wkLeft");keyDn=false;key_left=false; break; //left
-		case 38: player.gotoAndStop("wkUp");keyDn=false;key_up=false; break; //up
-		case 39: player.gotoAndStop("wkRight");keyDn=false;key_right=false; break; //right
-		case 40: player.gotoAndStop("wkDown");keyDn=false;key_down=false; break; //down
+		case 37: if(!(key_up || key_down))player.gotoAndStop("wkLeft");key_left=false;update_anim=true; break; //left
+		case 38: if(!(key_left || key_right))player.gotoAndStop("wkUp");key_up=false;update_anim=true; break; //up
+		case 39: if(!(key_up || key_down))player.gotoAndStop("wkRight");key_right=false;update_anim=true; break; //right
+		case 40: if(!(key_left || key_right))player.gotoAndStop("wkDown");key_down=false;update_anim=true; break; //down
 	}
 }
 
@@ -300,42 +307,63 @@ function isWalkable(tileId){
 	if (tileId == 0 || tileId == NaN)
 		return false;
 	return true
-	// if (tileproperties[tileId] != null){
-	// 	if ()
-	// 	// var walkable = tileproperties[tileId].walkable;
-	// 	// if (walkable != null && walkable == "0")
-	// 	// 	return true;
-	// }
-	// return false;
+}
+
+function updateAnim(){
+	if (key_up && key_right){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkUpRight");
+			//keyDn=true;
+		//}
+	} else if (key_up && key_left){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkUpLeft");
+			//keyDn=true;
+		//}
+	} else if (key_down && key_right){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkDownRight");
+			//keyDn=true;
+		//}
+	} else if (key_down && key_left){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkDownLeft");
+			//keyDn=true;
+		//}
+	} else if (key_up){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkUp");
+			//keyDn=true;
+		//}
+	} else if (key_right){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkRight");
+			//keyDn=true;
+		//}
+	} else if (key_down){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkDown");
+			//keyDn=true;
+		//}
+	} else if (key_left){
+		//if (keyDn == false){
+			player.gotoAndPlay("wkLeft");
+			//keyDn=true;
+		//}
+	}
+	update_anim = false;
 }
 
 function tick(event){
 	var collide = false;
 	var lap = getFuturePosition();
-	//console.log(lap);
 	var tileIds = getTileIdsFromPosition(lap)
-	//console.log(tileIds)
 	for (var i in tileIds){
 		if (!isWalkable(tileIds[i])){
 			collide = true;
-			//console.log(collide)
 			break
 		}
 	}
-
-	
-	// for (var i in tileIds){
-	// 	//console.log(tileIds[i])
-	// 	if (isNaN(tileIds[i]) || tileIds[i] == 174){
-	// 		collide = true;
-	// 		break
-	// 	}
-	// 	if (hasProperties(tileIds[i])){
-	// 		if(check_collide(tileIds[i]))
-	// 			collide = true;
-	// 	}
-	// }
-	//console.log(event.delta);
 	if (!collide){
 
 		if (key_left){
@@ -355,58 +383,12 @@ function tick(event){
 			player.y += speed_walk/2;
 		}
 
-
-		if (key_up && key_right){
-			if (keyDn == false){
-				player.gotoAndPlay("wkUpRight");
-				keyDn=true;
-			}
-		} else if (key_up && key_left){
-			if (keyDn == false){
-				player.gotoAndPlay("wkUpLeft");
-				keyDn=true;
-			}
-		} else if (key_down && key_right){
-			if (keyDn == false){
-				player.gotoAndPlay("wkDownRight");
-				keyDn=true;
-			}
-		} else if (key_down && key_left){
-			if (keyDn == false){
-				player.gotoAndPlay("wkDownLeft");
-				keyDn=true;
-			}
-		} else if (key_up){
-			if (keyDn == false){
-				player.gotoAndPlay("wkUp");
-				keyDn=true;
-			}
-		} else if (key_right){
-			if (keyDn == false){
-				player.gotoAndPlay("wkRight");
-				keyDn=true;
-			}
-		} else if (key_down){
-			if (keyDn == false){
-				player.gotoAndPlay("wkDown");
-				keyDn=true;
-			}
-		} else if (key_left){
-			if (keyDn == false){
-				player.gotoAndPlay("wkLeft");
-				keyDn=true;
-			}
-		}
+		if (update_anim)
+			updateAnim();		
 		var xy = getXY();
 		var xy_iso = getIsoFromCartesian(xy);
 		var index = xy_iso.y+2;
-		// var index2 = 0;
-		// if (index2 > index)
-		// 	index = index2;
-		//console.log("ISO: "+index+"   H: " + index2)
-		//console.log(index2);
 		map[2].setChildIndex(player, index*2)
-		//console.log(getXY().y/32)
 	}
 	
 	stage.update();
