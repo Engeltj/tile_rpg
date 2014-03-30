@@ -7,6 +7,7 @@ var key_right;
 var key_up;
 var key_down;
 var update_anim;
+var token;
 
 var img_actor;
 var player;
@@ -48,6 +49,10 @@ var speed_drive = 6;
 
 window.onload = function()
 {
+	socket.on('login', function (data){
+		token = data;
+		console.log("login: " + token);
+	})
 	// json map data at the end of this file for ease of understanding (created on Tiled map editor)
 	mapData = mapDataJson;
 
@@ -108,7 +113,7 @@ window.onload = function()
 	//stage.addChild(circle);
 	map[2].addChild(player);
 
-	setPlayerStart({x:18,y:16})
+	setPlayerStart({x:23,y:20})
 }
 
 // loading layers
@@ -231,16 +236,12 @@ function getXY(){
 function getCartesianFromIso(mapPos){
 	var x = (mapPos.x - mapPos.y) / 2 * 64
     var y = (mapPos.y + mapPos.x) / 4 * 64
-    console.log(mapPos)
-    console.log({x:x,y:y})
     return {x:x,y:y};
 }
 //uses ISO
 function getIsoFromCartesian(mapPos){
 	var x = Math.round((mapPos.x + 2*mapPos.y)/64);
     var y = Math.round((2*mapPos.y - mapPos.x)/64);
-    // console.log(mapPos);
-    // console.log( { x : x, y : y});
     return { x : x, y : y};
 }
 
@@ -260,10 +261,8 @@ function getFuturePosition(){
 
 function getTileIdsFromPosition(mapPos){
 	var tileIds = [];
-	for (var i=0;i<mapData.layers.length;i++){
+	for (var i=0;i<mapData.layers.length;i++)
 		tileIds.push(mapData.layers[i].data[mapPos.x+mapPos.y*mapData.height] - 1)
-	}
-	
 	return tileIds;
 }
 
@@ -278,47 +277,22 @@ function isWalkable(tileId){
 }
 
 function updateAnim(){
-	if (key_up && key_right){
-		//if (keyDn == false){
+	if (key_up && key_right)
 			player.gotoAndPlay("wkUpRight");
-			//keyDn=true;
-		//}
-	} else if (key_up && key_left){
-		//if (keyDn == false){
+	else if (key_up && key_left)
 			player.gotoAndPlay("wkUpLeft");
-			//keyDn=true;
-		//}
-	} else if (key_down && key_right){
-		//if (keyDn == false){
+	else if (key_down && key_right)
 			player.gotoAndPlay("wkDownRight");
-			//keyDn=true;
-		//}
-	} else if (key_down && key_left){
-		//if (keyDn == false){
+	else if (key_down && key_left)
 			player.gotoAndPlay("wkDownLeft");
-			//keyDn=true;
-		//}
-	} else if (key_up){
-		//if (keyDn == false){
+	else if (key_up)
 			player.gotoAndPlay("wkUp");
-			//keyDn=true;
-		//}
-	} else if (key_right){
-		//if (keyDn == false){
+	else if (key_right)
 			player.gotoAndPlay("wkRight");
-			//keyDn=true;
-		//}
-	} else if (key_down){
-		//if (keyDn == false){
+	else if (key_down)
 			player.gotoAndPlay("wkDown");
-			//keyDn=true;
-		//}
-	} else if (key_left){
-		//if (keyDn == false){
+	else if (key_left)
 			player.gotoAndPlay("wkLeft");
-			//keyDn=true;
-		//}
-	}
 	update_anim = false;
 }
 
@@ -352,7 +326,8 @@ function tick(event){
 		}
 
 		if (update_anim)
-			updateAnim();		
+			updateAnim();
+		socket.emit('position', {x:player.x,y:player.y});
 		var xy = getXY();
 		var xy_iso = getIsoFromCartesian(xy);
 		var index = xy_iso.y+2;

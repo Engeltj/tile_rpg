@@ -4,6 +4,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<title>Life Online</title>
 	<script type="text/javascript" src="easeljs-0.7.1.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io.connect(document.URL);
+		//socket.emit('position', { my: 'data' });
+	</script>
 	<script type="text/javascript" src="renderer.js"></script>
 </head>
 <body style="overflow: hidden">

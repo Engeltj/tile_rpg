@@ -4,6 +4,10 @@ var http = require("http"),
     fs = require("fs")
     port = process.argv[2] || 8888;
 var request = require('request')
+var clients = {}
+var PLAYER = {
+  position: {}
+}
 var app = http.createServer(function(request, response) {
  
   var uri = url.parse(request.url).pathname
@@ -34,16 +38,28 @@ var app = http.createServer(function(request, response) {
   });
 }).listen(parseInt(port, 10));
 
+var rand = function() {
+  return Math.random().toString(36).substr(2); // remove `0.`
+};
+
+var token = function() {
+  return rand() + rand(); // to make it longer
+};
+
 var io = require('socket.io').listen(app);
 
 io.sockets.on('connection', function (socket) {
     console.log("hit")
-    socket.on('data', function (data) {
-    	//io.sockets.emit ('temps', data);
-    	//console.log(data[6])
-	});
+    var tok = token();
+    clients[tok] = PLAYER;
+    socket.emit('login',tok);
+    socket.on('position', function (data) {
+      if (!(clients[data.token] == null))
+        clients[data.token].position = data.position;
+    });
 
 	socket.on('disconnect', function () {
 
 	});
 });
+
