@@ -8,10 +8,6 @@ var key_up;
 var key_down;
 var update_anim;
 
-
-// var keyDn=false;
-// var keys = 0;
-// var pressed=0;
 var img_actor;
 var player;
 var tileproperties = {};
@@ -52,7 +48,6 @@ var speed_drive = 6;
 
 window.onload = function()
 {
-	//canvas = document.getElementById("game");
 	// json map data at the end of this file for ease of understanding (created on Tiled map editor)
 	mapData = mapDataJson;
 
@@ -60,11 +55,6 @@ window.onload = function()
 	stage = new createjs.Stage("game");
 	stage.x = mapData.height/2 * -1 * 32 - 32*8;
 	stage.y = mapData.width/2 * -1 * 16 - 16*8;
-
-	// var test1 = {1:"hello"}
-	// var test2 = {2:"world"}
-	// var test3 = Object.extend(test1, test2); 
-	// console.log(test3[2])
 
 	var circle = new createjs.Shape();
     circle.graphics.beginFill("red").drawCircle(0, 0, 5);
@@ -80,13 +70,6 @@ window.onload = function()
 	    	map[i].addChild(mapLayers[i][j]);
 	    }
     }
-	
-	// create EaselJS image for tileset
-	//tileset = new Image();
-	// getting imagefile from first tileset
-	//tileset.src = mapData.tilesets[0].image;
-	// callback for loading layers after tileset is loaded
-	//tileset.onLoad = initLayers();
 
 	initLayers();
 	document.onkeydown=handleKeyDown;
@@ -125,7 +108,7 @@ window.onload = function()
 	//stage.addChild(circle);
 	map[2].addChild(player);
 
-	setPlayerStart({x:2,y:2})
+	setPlayerStart({x:18,y:16})
 }
 
 // loading layers
@@ -148,10 +131,7 @@ function initLayers() {
 	// create spritesheet
 	var tilesetSheet = new createjs.SpriteSheet(imageData);
 	tileproperties = getTileProperties(mapData.tilesets);
-	//console.log(tileproperties)
-	// loading each layer at a time
-	//for (var idx = 0; idx < mapData.layers.length; idx++) {
-		//var layerData = mapData.layers[idx];
+
 	var layerBackground = mapData.layers[0];
 	var layerGround = mapData.layers[1];
 	initLayer(layerBackground, tilesetSheet, mapData.tilewidth, mapData.tileheight, tileproperties);
@@ -212,29 +192,8 @@ function getTileProperties(tilesets){
 	return tileproperties;
 }
 
-
-// function test(){
-// 	var i = 0;
-// 	if (key_up) i++;
-// 	if (key_right) i++;
-// 	if (key_left) i++;
-// 	if (key_down) i++;
-// 	if (i == 2)
-// 		keyDn=false;
-// 	return i;
-// }
-
-function test2(){
-
-}
-
 function handleKeyDown(e){
 	if (!e){var e = window.event;}
-	// if (test() > pressed){
-	// 	pressed = test();
-	// 	//keyDn=false;
-	// }
-
 	switch(e.keyCode){
 		case 37: if(!key_left){key_right=false;key_left=true; update_anim=true;} break; //left
 		case 38: if(!key_up){key_up=true;key_down=false; update_anim=true;} break; //up
@@ -255,9 +214,7 @@ function handleKeyUp(e){
 
 //uses ISO
 function setPlayerStart(mapPos){
-
 	offset = getCartesianFromIso(mapPos);
-	console.log(offset);
 	mapContainer.x += offset.x*-1
 	mapContainer.y += offset.y*-1
 	player.x += offset.x;
@@ -272,16 +229,18 @@ function getXY(){
 }
 
 function getCartesianFromIso(mapPos){
-	mapPos.x = mapPos.x*64
-    mapPos.y = mapPos.y*64
-    mapPos.x = mapPos.x - mapPos.y/2;
-    mapPos.y = mapPos.x + mapPos.y/2;
-    return mapPos;
+	var x = (mapPos.x - mapPos.y) / 2 * 64
+    var y = (mapPos.y + mapPos.x) / 4 * 64
+    console.log(mapPos)
+    console.log({x:x,y:y})
+    return {x:x,y:y};
 }
 //uses ISO
 function getIsoFromCartesian(mapPos){
 	var x = Math.round((mapPos.x + 2*mapPos.y)/64);
     var y = Math.round((2*mapPos.y - mapPos.x)/64);
+    // console.log(mapPos);
+    // console.log( { x : x, y : y});
     return { x : x, y : y};
 }
 
