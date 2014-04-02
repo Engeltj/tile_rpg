@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Life Online</title>
+
+	<link href="assets/css/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="assets/conn.js"></script>
+	<script type="text/javascript" src="libs/core-min.js"></script>
+	<script type="text/javascript" src="libs/sha256-min.js"></script>
+	<script>
+		if (sessionStorage.token){
+			window.location.href = "index.html";
+		}
+		var check = function(form) {
+			var hash = CryptoJS.SHA256(form.pwd.value).toString();
+			console.log(hash);
+			socket.emit('login', {username:form.userid.value,password:hash});
+		}
+		socket.on('loginFailure', function (reason){
+			alert(reason);
+		});
+		socket.on('assignToken', function (data) {
+			if (data){
+				console.log("token received: "+ data)
+				sessionStorage.token =  data;
+				window.location.href = "index.html";
+			} 
+		});
+	</script>
+</head>
+<body  style="margin: 0 0 0 0; background: url('assets/img/bg.jpg')repeat;">
+	<!-- <div style="margin-left:auto;margin-right:auto;position:relative; width:600px;height:342px"></div> -->
+	<div style="margin-top:125px; height:342px; width:600px;margin-left:auto;margin-right:auto;background: url('assets/img/login.jpg'); border-radius:15px;">
+		<form class="form" role="form" method="post" style="height:0px; width:300px;;margin-left:auto;margin-right:auto;padding-top:50px;">
+			<input style="margin-bottom:5px;" type="text" class="form-control" name="userid" placeholder="Username"></input>
+			<input style="margin-bottom:5px;" type="password" class="form-control" name="pwd" placeholder="Password"></input>
+			<button style="margin-bottom:5px;" onclick="check(this.form)" class="btn btn-default" >Go!</button>
+			<!--<a href="p-register.php"><button type="button" class="btn btn-small" style="height:32px" >Register</button></a>-->
+		</form>
+	</div>
+
+	<!-- <form name="login">
+		Username<input type="text" name="userid"/>
+		Password<input type="password" name="pwd"/>
+		<input type="button" onclick="check(this.form)" value="Login"/>
+		<input type="reset" value="Cancel"/>
+	</form> -->
+</body>

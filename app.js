@@ -4,10 +4,14 @@ var http = require("http"),
     fs = require("fs")
     port = process.argv[2] || 8888;
 var request = require('request')
-var clients = {}
 var PLAYER = {
+  username: "",
   position: {}
 }
+
+eval(fs.readFileSync('assets/function.js')+'');
+eval(fs.readFileSync('sql.js')+'');
+
 var app = http.createServer(function(request, response) {
  
   var uri = url.parse(request.url).pathname
@@ -42,24 +46,98 @@ var rand = function() {
   return Math.random().toString(36).substr(2); // remove `0.`
 };
 
-var token = function() {
+var getToken = function() {
   return rand() + rand(); // to make it longer
 };
 
-var io = require('socket.io').listen(app);
+Object.deepExtend = function(destination, source) {
+  for (var property in source) {
+    if (typeof source[property] === "object" &&
+     source[property] !== null ) {
+      destination[property] = destination[property] || {};
+      arguments.callee(destination[property], source[property]);
+    } else {
+      destination[property] = source[property];
+    }
+  }
+  return destination;
+};
 
+// setInterval(function(){ 
+//     console.log(clients);
+// }, 500);
+
+function isClone(username){
+  for (key in registered){
+    if (registered[key].username == username)
+      return true
+  }
+  return false
+}
+
+var registered = {};
+var unregistered = {};
+
+var io = require('socket.io').listen(app, { log: false });
 io.sockets.on('connection', function (socket) {
-    console.log("hit")
-    var tok = token();
-    clients[tok] = PLAYER;
-    socket.emit('login',tok);
-    socket.on('position', function (data) {
-      if (!(clients[data.token] == null))
-        clients[data.token].position = data.position;
+    var token;
+
+    socket.on('setupToken', function (data){
+      data = data || {} //protection
+      if (unregistered[data]){
+        registered[data] = unregistered[data];
+        token = data;
+        socket.emit('tokenResponse',  registered[data])
+        for (key in registered){
+          socket.emit('get_positions', {token: registered[key].token, x: registered[key].x, y: registered[key].y, anim: registered[key].anim})
+        }
+      } else
+        socket.emit('tokenResponse')
     });
 
-	socket.on('disconnect', function () {
+    socket.on('login', function (data) {
+      data = data || {} //protection
+      console.log('Login attempted for "' + data.username +'"')
+      if (isClone(data.username)){
+        socket.emit('loginFailure', "Already logged in ..")
+      } else {
+        var success=false;
+        loadClient(data, function(err, result){
+          if (err == null){
+            if (result){
+              success=true
+              token = getToken();
+              unregistered[token] = PLAYER;
+              unregistered[token].username = result.username;
+              unregistered[token].position.x = result.x;
+              unregistered[token].position.y = result.y;
+              unregistered[token].position.stage = result.stage;
+              socket.emit('assignToken', token)
+            } else if (!success)
+              socket.emit('loginFailure', "Incorrect username/password")
+          } else
+            socket.emit('loginFailure', "Database malfunction")
+        });
+      }
+    });
 
-	});
+    socket.on('position', function (data) {
+      if (registered[data.token] != null){
+        registered[data.token].position.x = data.x;
+        registered[data.token].position.y = data.y;
+        console.log(registered[data.token].position)
+        io.sockets.emit('get_positions', {token: data.token, x: data.x, y: data.y, anim: data.anim})//{token: data.token, x:clients[data.token].position.x,y:clients[data.token].position.y});
+      } else {
+        socket.emit('tokenResponse');
+      }
+    });
+
+  	socket.on('disconnect', function () {
+      if (registered[token] != null){
+        saveClient(registered[token], null);
+        io.sockets.emit('disconnect', token);
+        delete registered[token];
+      }
+  	});
 });
 
