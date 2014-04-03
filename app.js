@@ -4,10 +4,6 @@ var http = require("http"),
     fs = require("fs")
     port = process.argv[2] || 8888;
 var request = require('request')
-var PLAYER = {
-  username: "",
-  position: {}
-}
 
 eval(fs.readFileSync('assets/function.js')+'');
 eval(fs.readFileSync('sql.js')+'');
@@ -42,26 +38,26 @@ var app = http.createServer(function(request, response) {
   });
 }).listen(parseInt(port, 10));
 
-var rand = function() {
-  return Math.random().toString(36).substr(2); // remove `0.`
-};
+// var rand = function() {
+//   return Math.random().toString(36).substr(2); // remove `0.`
+// };
 
-var getToken = function() {
-  return rand() + rand(); // to make it longer
-};
+// var getToken = function() {
+//   return rand() + rand(); // to make it longer
+// };
 
-Object.deepExtend = function(destination, source) {
-  for (var property in source) {
-    if (typeof source[property] === "object" &&
-     source[property] !== null ) {
-      destination[property] = destination[property] || {};
-      arguments.callee(destination[property], source[property]);
-    } else {
-      destination[property] = source[property];
-    }
-  }
-  return destination;
-};
+// Object.deepExtend = function(destination, source) {
+//   for (var property in source) {
+//     if (typeof source[property] === "object" &&
+//      source[property] !== null ) {
+//       destination[property] = destination[property] || {};
+//       arguments.callee(destination[property], source[property]);
+//     } else {
+//       destination[property] = source[property];
+//     }
+//   }
+//   return destination;
+// };
 
 // setInterval(function(){ 
 //     console.log(clients);
@@ -69,7 +65,7 @@ Object.deepExtend = function(destination, source) {
 
 function isClone(username){
   for (key in registered){
-    if (registered[key].username == username)
+    if (registered[key].username.toLowerCase() == username.toLowerCase())
       return true
   }
   return false
@@ -106,7 +102,11 @@ io.sockets.on('connection', function (socket) {
           if (err == null){
             if (result){
               success=true
-              token = getToken();
+              token = socket.id;
+              var PLAYER = {
+                username: "",
+                position: {}
+              }
               unregistered[token] = PLAYER;
               unregistered[token].username = result.username;
               unregistered[token].position.x = result.x;
@@ -122,17 +122,17 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('position', function (data) {
-      if (registered[data.token] != null){
+      if (data && (registered[data.token] != null)){
         registered[data.token].position.x = data.x;
         registered[data.token].position.y = data.y;
-        console.log(registered[data.token].position)
-        io.sockets.emit('get_positions', {token: data.token, x: data.x, y: data.y, anim: data.anim})//{token: data.token, x:clients[data.token].position.x,y:clients[data.token].position.y});
+        socket.broadcast.emit('get_positions', {token: data.token, x: data.x, y: data.y, anim: data.anim})//{token: data.token, x:clients[data.token].position.x,y:clients[data.token].position.y});
       } else {
         socket.emit('tokenResponse');
       }
     });
 
   	socket.on('disconnect', function () {
+      console.log('disconnected: ' + token)
       if (registered[token] != null){
         saveClient(registered[token], null);
         io.sockets.emit('disconnect', token);

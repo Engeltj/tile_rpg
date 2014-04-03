@@ -2,14 +2,19 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>Life Online</title>
+	<title></title>
+	<link href="assets/css/evertz-slate-all.min.css" rel="stylesheet">
 	<script src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="easeljs-0.7.1.min.js"></script>
 	<script type="text/javascript" src="assets/function.js"></script>
 	<script type="text/javascript" src="assets/conn.js"></script>
 	<script type="text/javascript" src="renderer.js"></script>
 </head>
-<body style="overflow: hidden">
-	<canvas id="game" style="background-color: #AAAAAA" width="960" height="576">Canvas not supported. Please update your browser.</canvas>	
+<body style="overflow:hidden; margin: 0 0 0 0; background: #333 url('assets/img/bg.jpg')repeat;">
+	<div class="container">
+		<div style="width:960px;height:576px;margin-left:auto;margin-right:auto;border-style:solid;border-width:5px;">
+			<canvas id="game" style="background: #000;" width="960" height="576">Canvas not supported. Please update your browser.</canvas>
+		</div>
+	</div>
 </body>
 </html>

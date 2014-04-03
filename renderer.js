@@ -14,42 +14,21 @@ var player;
 var circle;
 var opponents = {};
 var tileproperties = {};
-var mapLayers = {};
-var mapContainer = {};
-var map = {};
-var mapLayers = {};
+// var mapLayers = {};
+// var mapContainer = {};
+// var map = {};
+// var mapLayers = {};
+var cMap;
+var cLayers;
+var cTiles;
+
+var tiles = {};
+var offset = {};
 
 var speed_walk = 3;
 var speed_drive = 6;
 
 var initialized = false;
-
-
-// Current attempted motion by the player
-// var Motion = {
-//     // PLACED: 'Placed',
-//     STATIONERY: 'Stationery',
-//     MOVING_UP: 'Moving up',
-//     MOVING_UP_LEFT: 'Moving up and to the left',
-//     MOVING_UP_RIGHT: 'Moving up and to the right',
-//     MOVING_RIGHT: 'Moving right',
-//     MOVING_DOWN: 'Moving down',
-//     MOVING_DOWN_LEFT: 'Moving down to the left',
-//     MOVING_DOWN_RIGHT: 'Moving down to the right',
-//     MOVING_LEFT: 'Moving left',
-// };
-
-// // Stores current player position and status
-// var PLAYER = {
-//     sector: 0,
-//     x: 5,
-//     y: 5,
-//     sprite: SPRITES['PlayerRight'],
-//     status: Motion.STATIONERY,
-//     $: null,
-//     before: null,
-//     after: null,
-// };
 
 window.onload = function()
 {
@@ -57,6 +36,7 @@ window.onload = function()
 		window.location.href = "login.html";
 	else
 		token = sessionStorage.token;
+	//init();
 	socketListeners()
 	socket.emit('setupToken', token)
 }
@@ -67,51 +47,51 @@ function init(){
 
 	// creating EaselJS stage
 	stage = new createjs.Stage("game");
-	stage.x = mapData.height/2 * -1 * 32 - 32*8;
-	stage.y = mapData.width/2 * -1 * 16 - 16*8;
+	offset.x = stage.canvas.width/2
+	offset.y = stage.canvas.height/2
 
-	// circle = new createjs.Shape();
- //    circle.graphics.beginFill("red").drawCircle(0, 0, 5);
- //    circle.x = 
- //    circle.y = 
+	// var containerLayer = [];
+	// for (var l=0;l<2;l++)
+	// 	tiles[l] = []
+	//  	for (var x=0;x<mapData.width;x++){
+	//  		tiles[l][x] = []
+	//  		for (var y=0;y<mapData.height;y++)
+	//  			tiles[l][x][y] = new createjs.Container();
+	//  	}
 
-    mapContainer = new createjs.Container();
-    for (var i=0;i<3;i++){
-    	map[i] = new createjs.Container();
-    	mapLayers[i] = {};
-    	for (var j=0;j<mapData.height*2;j++){
-	    	mapLayers[i][j] = new createjs.Container();
-	    	map[i].addChild(mapLayers[i][j]);
-	    }
-    }
+ //    
+	cMap = new createjs.Container();
+	cLayers = []
+	cTiles = []
+ 	for (var l=0;l<2;l++){
+ 		cLayers[l] = new createjs.Container();
+ 		cMap.addChild(cLayers[l])
+ 		cTiles[l] = []
+	 	for (var a=0;a<(mapData.height+mapData.width);a++){
+	 		cTiles[l][a] = new createjs.Container();
+	 		cLayers[l].addChild(cTiles[l][a]);
+	 	}
+	}
+
+    cMap.x += offset.x
+    cMap.y += offset.y
 
 	initLayers();
 	document.onkeydown=handleKeyDown;
 	document.onkeyup=handleKeyUp;
 
 	img_actor = new Image();
-	img_actor.onload = cb_createPlayer();
+	//img_actor.onload = 
 	img_actor.src = "assets/actor_x156.png";
-	//img_actor.filters = [ new createjs.ColorFilter(0,0,0,1, 0,0,255,0)]
-	
-	//console.log(stage.canvas.width/2)
-	for (var key in map){
-		mapContainer.addChild(map[key]);
-	}
-	stage.addChild(mapContainer);
-	stage.addChild(player);
-	//stage.addChild(circle);
-	
-	socketListeners();
+	player = createPlayer({x:0,y:0});
+
+	stage.addChild(cMap);
+
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", tick);
 }
 
-var cb_createPlayer = function(){
-	var offset = {x: stage.canvas.width/2 - stage.x, y: stage.canvas.height/2 - stage.y}
-	player = createPlayer({x:offset.x, y: offset.y-32});
-	//stage.addChild(player);
-}
+
 
 function socketListeners(){
 	socket.on('tokenResponse', function (data){
@@ -121,8 +101,7 @@ function socketListeners(){
 				setPlayerStart({x:18,y:20})
 			}
 			else {
-				data.position.x -= 1600-64;
-				data.position.y -= 768+32;
+				//console.log(data.position)
 				setPlayerStart(getIsoFromCartesian(data.position));
 			}
 			initialized = true;
@@ -134,25 +113,23 @@ function socketListeners(){
 	});
 
 	socket.on('get_positions', function (data) {
-		//if (data.token != token){
+		if (data.token && (data.token != token)){
 			var xy = {x:data.x, y:data.y}
 			if (opponents[data.token] == null){
-				opponents[data.token] = createPlayer(xy)
-				map[2].addChild(opponents[data.token]);
+				opponents[data.token] = createPlayer(xy);
 			} else {
-				opponents[data.token].x = xy.x
-				opponents[data.token].y = xy.y
+				opponents[data.token].x = xy.x 
+				opponents[data.token].y = xy.y 
 				if (opponents[data.token].currentAnimation != data.anim)
 					opponents[data.token].gotoAndPlay(data.anim)
 			}
-			var xy_iso = getIsoFromCartesian(xy);
-			var index = xy_iso.y+2;
-			map[2].setChildIndex(opponents[data.token], index*2)
-		//}
+			updatePlayerLayer(opponents[data.token]);
+			//updatePlayerLayer(player,player);
+		}
     });
 
     socket.on('disconnect', function (data) {
-    	map[2].removeChild(opponents[data]);
+    	//map[2].removeChild(opponents[data]);
     	delete opponents[data];
     });
 
@@ -160,10 +137,12 @@ function socketListeners(){
 }
 
 function createPlayer(position){
+	var width = 39;
+	var height = 64;
+
 	var spriteSheet = new createjs.SpriteSheet({
-		framerate: 1,
 		images: [img_actor],
-		frames: {width:39, height:64},
+		frames: {width:width, height:height},
 		animations: {
 			wkDown:[0,3, "wkDown", 1/3], 
 			wkLeft:[4,7, "wkLeft", 1/3], 
@@ -185,13 +164,13 @@ function createPlayer(position){
 		}
 	});
 
-	var player = new createjs.Sprite(spriteSheet);
-	player.regX = 39/2;
-	player.regY = 64/4;
-	player.x = position.x;
-	player.y = position.y;
-	player.gotoAndStop("wkDown");
-	return player;
+	var newplayer = new createjs.Sprite(spriteSheet);
+	newplayer.regX = width/2;
+	newplayer.regY = height - mapData.tileheight/2;
+	newplayer.x = position.x;
+	newplayer.y = position.y;
+	newplayer.gotoAndStop("wkDown");
+	return newplayer;
 }
 
 // loading layers
@@ -219,13 +198,6 @@ function initLayers() {
 	var layerGround = mapData.layers[1];
 	initLayer(layerBackground, tilesetSheet, mapData.tilewidth, mapData.tileheight, tileproperties);
 	initLayer(layerGround, tilesetSheet, mapData.tilewidth, mapData.tileheight, tileproperties);
-		//if (layerData.type == 'tilelayer')
-			
-	//}
-	// stage updates (not really used here)
-	
-
-	//setInterval(function(){animPlayer()}, 500); 
 }
 
 // layer initialization
@@ -243,18 +215,20 @@ function initLayer(layerData, tilesetSheet, tilewidth, tileheight, tilepropertie
 			var tileId = layerData.data[idx] - 1;
 			// tilemap data uses 1 as first value, EaselJS uses 0 (sub 1 to load correct tile)
 			cellBitmap.gotoAndStop(tileId);
+
 			// isometrix tile positioning based on X Y order from Tiled
-			cellBitmap.x = x * tilewidth/2 - y * tilewidth/2 + layerData.height*tilewidth/2 - tileheight - 64;
-			cellBitmap.y = y * tileheight/2 + x * tileheight/2 + layerData.height*tileheight/2 + tileheight - 32;
-			
-			var variableLayer = getIsoFromCartesian({x:cellBitmap.x, y:cellBitmap.y}).y-2//Math.round(cellBitmap.y/tileheight)-9;//getIsoXYFromPosition({x:cellBitmap.x, y:cellBitmap.y}).x-16;
-			variableLayer*=2
+			cellBitmap.x = x * tilewidth/2 - y * tilewidth/2 - tilewidth/2// + layerData.height*tilewidth/2 - tilewidth;
+			cellBitmap.y = y * tileheight/2 + x * tileheight/2 - tileheight/2// + layerData.height*tileheight/2 - tileheight;
+
+			var variableLayer = getIsoFromCartesian({x:cellBitmap.x, y:cellBitmap.y}).y
+			//console.log(variableLayer)
+			//variableLayer*=2
 			var distanceFromBase = 0;
 			if (tileproperties[tileId.toString()] != null)
 				distanceFromBase = parseInt(tileproperties[tileId.toString()].base) + 1 || 1;
-			variableLayer+=(distanceFromBase*2);
+			variableLayer+=(distanceFromBase);
 
-			mapLayers[layer][variableLayer].addChild(cellBitmap);
+			cTiles[layer][variableLayer].addChild(cellBitmap);
 			
 		}
 	}
@@ -299,16 +273,16 @@ function handleKeyUp(e){
 //uses ISO
 function setPlayerStart(mapPos){
 	offset = getCartesianFromIso(mapPos);
-	mapContainer.x += offset.x*-1
-	mapContainer.y += offset.y*-1
+	cMap.x += offset.x*-1
+	cMap.y += offset.y*-1
 	player.x += offset.x;
 	player.y += offset.y;
 }
 
 //returns cartesian
 function getXY(){
-	var x = mapContainer.x*-1;
-	var y = mapContainer.y*-1;
+	var x = player.x//*-1;
+	var y = player.y//*-1;
 	return {x:x,y:y};
 }
 
@@ -363,6 +337,17 @@ function updateAnim(){
 	update_anim = false;
 }
 
+function updatePlayerLayer(player){
+	var xy = getIsoFromCartesian({x:player.x,y:player.y});
+	updatePlayerLayerIso(player, xy);
+}
+
+function updatePlayerLayerIso(player, xy){
+	//console.log(xy)
+	var index = xy.y+3;
+	cTiles[1][index].addChild(player);
+}
+
 var old_movements = {x:-1,y:-1,anim:""}
 
 function tick(event){
@@ -377,19 +362,19 @@ function tick(event){
 	}
 	if (!collide){
 		if (key_left){
-			mapContainer.x += speed_walk;
+			cMap.x += speed_walk;
 			player.x -= speed_walk;
 		}
 		if (key_right){
-			mapContainer.x -= speed_walk;
+			cMap.x -= speed_walk;
 			player.x += speed_walk;
 		}
 		if (key_up){
-			mapContainer.y += speed_walk/2;
+			cMap.y += speed_walk/2;
 			player.y -= speed_walk/2;
 		}
 		if (key_down){
-			mapContainer.y -= speed_walk/2;
+			cMap.y -= speed_walk/2;
 			player.y += speed_walk/2;
 		}
 
@@ -397,16 +382,12 @@ function tick(event){
 			updateAnim();
 		if (token){
 			if ((old_movements.x != player.x) || (old_movements.y != player.y) || (old_movements.anim != player.currentAnimation)){
-				socket.emit('position', {token: token, x: player.x, y: player.y, anim: player.currentAnimation});//{token: token, position: {x:player.x, y:player.y}});
+				socket.emit('position', {token: token, x: player.x, y: player.y, anim: player.currentAnimation});
 				old_movements = {x:player.x, y:player.y, anim: player.currentAnimation}
+				updatePlayerLayer(player);
 			}
 		}
-		var xy = getXY();
-		var xy_iso = getIsoFromCartesian(xy);
-		var index = xy_iso.y+2;
-		map[2].setChildIndex(player, index*2)
 	}
-	
 	stage.update();
 }
 
