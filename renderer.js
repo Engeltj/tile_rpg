@@ -1,6 +1,7 @@
 var tileset = [];
 var stage;
 var mapData;
+var messaging;
 
 var key_left;
 var key_right;
@@ -39,6 +40,7 @@ window.onload = function()
 	//init();
 	socketListeners()
 	socket.emit('setupToken', token)
+
 }
 
 function init(){
@@ -89,6 +91,13 @@ function init(){
 
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", tick);
+	test();
+	chat_addMsg("Engeltj", "hi")
+	chat_addMsg("Engeltj", "1")
+	chat_addMsg("Engeltj", "2")
+	chat_addMsg("Engeltj", "3")
+	chat_addMsg("Engeltj", "4")
+	chat_addMsg("Engeltj", "hey there")
 }
 
 
@@ -255,6 +264,9 @@ function handleKeyDown(e){
 		case 38: if(!key_up){key_up=true;key_down=false; update_anim=true;} break; //up
 		case 39: if(!key_right){key_right=true;key_left=false; update_anim=true;} break; //right
 		case 40: if(!key_down){key_up=false;key_down=true; update_anim=true;} break; //down
+		case 84: if (!messaging){console.log('hi');e.preventDefault();e.stopPropagation();}chat_newMsg();break; //letter t
+		case 13: chat_sendMsg();break; //enter
+		default: console.log(e.keyCode)
 	}
 }
 

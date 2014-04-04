@@ -1,0 +1,38 @@
+canvas {
+	position: absolute;
+}
+#chat{
+	position: absolute;
+	
+}
+
+#chatArea{
+	display:none;
+	background:rgba(50,50,50,0.5);
+	border-radius: 3px;
+	padding: 5px 0px 5px 5px;
+	position: absolute;
+	bottom:50px;
+	left:0px;
+	margin-left:20px;
+	width:300px;
+	height:100px;
+}
+b {
+	color: lightblue;
+}
+
+#msg {
+	display: none;
+}
+
+textarea {
+    resize: none;
+    bottom:35px;
+	left:5px;
+}
+
+#container {
+	position: relative;
+	background: #FFF;
+}
