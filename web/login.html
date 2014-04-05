@@ -5,7 +5,7 @@
 	<title></title>
 
 	<!-- <link href="assets/css/bootstrap/css/bootstrap.css" rel="stylesheet"> -->
-	<link href="assets/css/evertz-slate-all.min.css" rel="stylesheet">
+	<link href="css/evertz-slate-all.min.css" rel="stylesheet">
 	<style>
 	    /* Login Adjustments */
 	    table.login td {
@@ -19,12 +19,12 @@
 
 
 	<script src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript" src="assets/conn.js"></script>
+	<script type="text/javascript" src="js/conn.js"></script>
 	<script type="text/javascript" src="libs/core-min.js"></script>
 	<script type="text/javascript" src="libs/sha256-min.js"></script>
 	<script>
 		if (sessionStorage.token)
-			window.location.href = "index.html";
+			window.location.href = "game.html";
 
 		var check = function(form) {
 			var hash = CryptoJS.SHA256(form.pwd.value).toString();
@@ -40,13 +40,13 @@
 			if (data){
 				console.log("token received: "+ data)
 				sessionStorage.token =  data;
-				window.location.href = "index.html";
+				window.location.href = "game.html";
 			} 
 		});
 
 	</script>
 </head>
-<body  style="margin: 0 0 0 0; background: #333 url('assets/img/bg.jpg')repeat;">
+<body  style="margin: 0 0 0 0; background: #333 url('img/bg.jpg')repeat;">
 	<div class="container">
 		<div class="row" style="margin-top:75px;">
 			<div class="span4"></div>

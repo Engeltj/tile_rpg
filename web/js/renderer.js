@@ -15,10 +15,7 @@ var player;
 var circle;
 var opponents = {};
 var tileproperties = {};
-// var mapLayers = {};
-// var mapContainer = {};
-// var map = {};
-// var mapLayers = {};
+
 var cMap;
 var cLayers;
 var cTiles;
@@ -52,16 +49,6 @@ function init(){
 	offset.x = stage.canvas.width/2
 	offset.y = stage.canvas.height/2
 
-	// var containerLayer = [];
-	// for (var l=0;l<2;l++)
-	// 	tiles[l] = []
-	//  	for (var x=0;x<mapData.width;x++){
-	//  		tiles[l][x] = []
-	//  		for (var y=0;y<mapData.height;y++)
-	//  			tiles[l][x][y] = new createjs.Container();
-	//  	}
-
- //    
 	cMap = new createjs.Container();
 	cLayers = []
 	cTiles = []
@@ -84,20 +71,14 @@ function init(){
 
 	img_actor = new Image();
 	//img_actor.onload = 
-	img_actor.src = "assets/actor_x156.png";
+	img_actor.src = "img/actor_x156.png";
 	player = createPlayer({x:0,y:0});
 
 	stage.addChild(cMap);
 
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", tick);
-	test();
-	chat_addMsg("Engeltj", "hi")
-	chat_addMsg("Engeltj", "1")
-	chat_addMsg("Engeltj", "2")
-	chat_addMsg("Engeltj", "3")
-	chat_addMsg("Engeltj", "4")
-	chat_addMsg("Engeltj", "hey there")
+	chatInit();
 }
 
 
@@ -106,13 +87,10 @@ function socketListeners(){
 	socket.on('tokenResponse', function (data){
 		if ((data) && (!initialized)){
 			init();
-			if ((!data.position.x) && (!data.position.y)){
+			if ((!data.position.x) && (!data.position.y))
 				setPlayerStart({x:18,y:20})
-			}
-			else {
-				//console.log(data.position)
-				setPlayerStart(getIsoFromCartesian(data.position));
-			}
+			else
+				setPlayerStart(getIsoFromCartesian(data.position))
 			initialized = true;
 		} else { 
 			delete sessionStorage.token
@@ -273,13 +251,14 @@ function handleKeyDown(e){
 function handleKeyUp(e){
 	if (!e){var e = window.event;}
 	var anim = player.currentAnimation.substring(2);
-	player.gotoAndStop("stop"+anim);
 	switch(e.keyCode){
 		case 37: key_left=false;update_anim=true; break; //left
 		case 38: key_up=false;update_anim=true; break; //up
 		case 39: key_right=false;update_anim=true; break; //right
 		case 40: key_down=false;update_anim=true; break; //down
 	}
+	if (update_anim)
+		player.gotoAndStop("stop"+anim);
 }
 
 //uses ISO

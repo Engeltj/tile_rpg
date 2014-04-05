@@ -1,21 +1,31 @@
 canvas {
 	position: absolute;
 }
+
 #chat{
 	position: absolute;
-	
+}
+
+#msg {
+	width:350px;
+	z-index:101; 
+	position:absolute; 
+	bottom:5px; 
+	left:0px;
+	margin-left:20px;
+	padding: 5 5 5 5;
 }
 
 #chatArea{
 	display:none;
 	background:rgba(50,50,50,0.5);
 	border-radius: 3px;
-	padding: 5px 0px 5px 5px;
+	padding: 5px 10px 5px 5px;
 	position: absolute;
 	bottom:50px;
 	left:0px;
 	margin-left:20px;
-	width:300px;
+	width:350px;
 	height:100px;
 }
 b {

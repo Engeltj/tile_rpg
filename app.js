@@ -38,31 +38,6 @@ var app = http.createServer(function(request, response) {
   });
 }).listen(parseInt(port, 10));
 
-// var rand = function() {
-//   return Math.random().toString(36).substr(2); // remove `0.`
-// };
-
-// var getToken = function() {
-//   return rand() + rand(); // to make it longer
-// };
-
-// Object.deepExtend = function(destination, source) {
-//   for (var property in source) {
-//     if (typeof source[property] === "object" &&
-//      source[property] !== null ) {
-//       destination[property] = destination[property] || {};
-//       arguments.callee(destination[property], source[property]);
-//     } else {
-//       destination[property] = source[property];
-//     }
-//   }
-//   return destination;
-// };
-
-// setInterval(function(){ 
-//     console.log(clients);
-// }, 500);
-
 function isClone(username){
   for (key in registered){
     if (registered[key].username.toLowerCase() == username.toLowerCase())
@@ -77,6 +52,20 @@ var unregistered = {};
 var io = require('socket.io').listen(app, { log: false });
 io.sockets.on('connection', function (socket) {
     var token;
+
+    function checkRegistered(){
+      if (!registered[token])
+        socket.disconnect()
+    }
+    
+
+    socket.on('chat', function (message){
+      checkRegistered()
+      console.log(registered[token])
+      if (message && message.length > 0){
+        io.sockets.emit('newMsg', {user: registered[token].username, msg: message.substring(0, 150)})
+      }
+    });
 
     socket.on('setupToken', function (data){
       data = data || {} //protection
@@ -121,6 +110,8 @@ io.sockets.on('connection', function (socket) {
       }
     });
 
+    
+
     socket.on('position', function (data) {
       if (data && (registered[data.token] != null)){
         registered[data.token].position.x = data.x;
@@ -139,5 +130,6 @@ io.sockets.on('connection', function (socket) {
         delete registered[token];
       }
   	});
+
 });
 
