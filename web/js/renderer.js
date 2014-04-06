@@ -157,6 +157,7 @@ function createPlayer(position){
 	newplayer.x = position.x;
 	newplayer.y = position.y;
 	newplayer.gotoAndStop("wkDown");
+	newplayer.on("click", playerClicked);
 	return newplayer;
 }
 
@@ -237,6 +238,7 @@ function getTileProperties(tilesets){
 
 function handleKeyDown(e){
 	if (!e){var e = window.event;}
+	console.log(e.keyCode);
 	switch(e.keyCode){
 		case 37: if(!key_left){key_right=false;key_left=true; update_anim=true;} break; //left
 		case 38: if(!key_up){key_up=true;key_down=false; update_anim=true;} break; //up
@@ -244,8 +246,13 @@ function handleKeyDown(e){
 		case 40: if(!key_down){key_up=false;key_down=true; update_anim=true;} break; //down
 		case 84: if (!messaging){console.log('hi');e.preventDefault();e.stopPropagation();}chat_newMsg();break; //letter t
 		case 13: chat_sendMsg();break; //enter
+		case 32: createBullet({x:player.x,y:player.y-28}, getDirection()); break;
 		default: console.log(e.keyCode)
 	}
+	// if (e.keyCode != '32'){
+	// 	var e = jQuery.Event( 'keydown', { keyCode: '32'} );
+	// 	$(document).trigger(e);
+	// }
 }
 
 function handleKeyUp(e){
@@ -257,8 +264,10 @@ function handleKeyUp(e){
 		case 39: key_right=false;update_anim=true; break; //right
 		case 40: key_down=false;update_anim=true; break; //down
 	}
-	if (update_anim)
+	if (update_anim){
+		playerDirection = getDirection()
 		player.gotoAndStop("stop"+anim);
+	}
 }
 
 //uses ISO
@@ -345,6 +354,7 @@ function tick(event){
 	var collide = false;
 	var lap = getFuturePosition();
 	var tileIds = getTileIdsFromPosition(lap)
+	updateBullets()
 	for (var i in tileIds){
 		if (!isWalkable(tileIds[i])){
 			collide = true;
@@ -383,32 +393,15 @@ function tick(event){
 }
 
 
-
-// utility function for loading assets from server
-function httpGet(theUrl) {
-	var xmlHttp = null;
-	xmlHttp = new XMLHttpRequest();
-	xmlHttp.open("GET", theUrl, false);
-	xmlHttp.send(null);
-	return xmlHttp.responseText;
-}
-
-// utility function for loading json data from server
-function httpGetData(theUrl) {
-	var responseText = httpGet(theUrl);
-	return JSON.parse(responseText);
-}
-
-
 //for merging assosiative arrays
-Object.extend = function(destination, source) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property)) {
-            destination[property] = source[property];
-        }
-    }
-    return destination;
-};
+// Object.extend = function(destination, source) {
+//     for (var property in source) {
+//         if (source.hasOwnProperty(property)) {
+//             destination[property] = source[property];
+//         }
+//     }
+//     return destination;
+// };
 
 
 // Map data created on Tiled map editor (mapeditor.org). Use export for JSON format

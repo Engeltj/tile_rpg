@@ -5,7 +5,7 @@ var http = require("http"),
     port = process.argv[2] || 8888;
 var request = require('request')
 
-eval(fs.readFileSync('assets/function.js')+'');
+eval(fs.readFileSync('web/js/function.js')+'');
 eval(fs.readFileSync('sql.js')+'');
 
 var app = http.createServer(function(request, response) {
