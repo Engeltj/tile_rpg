@@ -240,10 +240,10 @@ function handleKeyDown(e){
 	if (!e){var e = window.event;}
 	console.log(e.keyCode);
 	switch(e.keyCode){
-		case 37: if(!key_left){key_right=false;key_left=true; update_anim=true;} break; //left
-		case 38: if(!key_up){key_up=true;key_down=false; update_anim=true;} break; //up
-		case 39: if(!key_right){key_right=true;key_left=false; update_anim=true;} break; //right
-		case 40: if(!key_down){key_up=false;key_down=true; update_anim=true;} break; //down
+		case 65: if(!key_left){key_right=false;key_left=true; update_anim=true;} break; //left
+		case 87: if(!key_up){key_up=true;key_down=false; update_anim=true;} break; //up
+		case 68: if(!key_right){key_right=true;key_left=false; update_anim=true;} break; //right
+		case 83: if(!key_down){key_up=false;key_down=true; update_anim=true;} break; //down
 		case 84: if (!messaging){console.log('hi');e.preventDefault();e.stopPropagation();}chat_newMsg();break; //letter t
 		case 13: chat_sendMsg();break; //enter
 		case 32: createBullet({x:player.x,y:player.y-28}, getDirection()); break;
@@ -259,10 +259,10 @@ function handleKeyUp(e){
 	if (!e){var e = window.event;}
 	var anim = player.currentAnimation.substring(2);
 	switch(e.keyCode){
-		case 37: key_left=false;update_anim=true; break; //left
-		case 38: key_up=false;update_anim=true; break; //up
-		case 39: key_right=false;update_anim=true; break; //right
-		case 40: key_down=false;update_anim=true; break; //down
+		case 65: key_left=false;update_anim=true; break; //left
+		case 87: key_up=false;update_anim=true; break; //up
+		case 68: key_right=false;update_anim=true; break; //right
+		case 83: key_down=false;update_anim=true; break; //down
 	}
 	if (update_anim){
 		playerDirection = getDirection()
