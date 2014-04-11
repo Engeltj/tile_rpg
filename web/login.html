@@ -19,10 +19,15 @@
 
 
 	<script src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript" src="js/conn.js"></script>
-	<script type="text/javascript" src="libs/core-min.js"></script>
-	<script type="text/javascript" src="libs/sha256-min.js"></script>
+	<script type="application/javascript" src="js/conn.js"></script>
+	<script type="application/javascript" src="libs/core-min.js"></script>
+	<script type="application/javascript" src="libs/sha256-min.js"></script>
+	<script type="text/javascript" src="libs/jquery-1.10.2.js"></script>
 	<script>
+		$('#loginForm').submit(function () {
+			return false;
+		});
+		
 		if (sessionStorage.token)
 			window.location.href = "game.html";
 
@@ -43,7 +48,6 @@
 				window.location.href = "game.html";
 			} 
 		});
-
 	</script>
 </head>
 <body  style="margin: 0 0 0 0; background: #333 url('img/bg.jpg')repeat;">
@@ -51,7 +55,7 @@
 		<div class="row" style="margin-top:75px;">
 			<div class="span4"></div>
 			<div class="span4">	
-				<form name="form1" method="POST" style="margin:0px">
+				<form id="loginForm" name="form1" method="POST" style="margin:0px">
 					<table class="login"><tbody>
 						<tr>
 							<td><h5>Login</h5></td>

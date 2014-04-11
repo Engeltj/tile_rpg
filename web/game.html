@@ -5,9 +5,11 @@
 	<title></title>
 	<link href="css/evertz-slate-all.min.css" rel="stylesheet">
 	<link href="css/chat.css" rel="stylesheet">
+	<link href="css/game.css" rel="stylesheet">
 	<link href="libs/jquery.mCustomScrollbar.css" rel="stylesheet">
 	<script src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript" src="libs/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="libs/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="libs/jquery-ui-1.10.4.min.js"></script>
 	<script type="text/javascript" src="libs/easeljs-0.7.1.min.js"></script>
 	<script type="text/javascript" src="js/function.js"></script>
 	<script type="text/javascript" src="js/conn.js"></script>
@@ -17,15 +19,50 @@
 	<script type="text/javascript" src="libs/jquery.mCustomScrollbar.concat.min.js"></script>
 	<script type="text/javascript" src="js/chat.js"></script>
 
+	<script>
+	  $(function() {
+	  	$(".window").resizable();
 
+	    $(".window").draggable({ 
+	    	containment: ".container",
+	    	handle: "#titlebar"
+	    });
 
+	  });
+  	</script>
 
 </head>
 <body style="overflow:hidden; margin: 0 0 0 0; background: #333 url('img/bg.jpg')repeat;">
 	<div class="container" style="position:relative;width:960px;height:576px;border-style:solid;border-width:5px;">
 			<canvas id="game" style="background: #000" width="960" height="576">Canvas not supported. Please update your browser.</canvas>
+			
 			<div id="chatArea" style=""></div>
 			<input id="msg" type="text"/>
+
+			<div id="infobar" class="dynamic">
+				<img src="img/clock.png" title="20:32" alt="worldtime"><p id="worldtime">20:32</p></img>
+				<img src="img/money.png" style="padding-left:20px"  alt="bits"><p id="bits">12351</p></img>
+			</div>
+
+			<div id="infobar" class="options">
+				<button id="btn_mail" class="btn btn-default" ><img src="img/mail.png" alt="mail"/></button>
+				<button id="btn_inventory" class="btn btn-default"><img src="img/inventory.png" alt="inventory"/></button>
+				<button id="btn_skills" class="btn btn-default"><img src="img/skills.png" alt="skills"/></button>
+			</div>
+
+			<div id="inventory" class="window">
+				<div id="titlebar"></div>
+				<div id="window_data"></div>
+				<img id="test"></img>
+			</div>
+			<div id="skills" class="window">
+				<div id="titlebar"></div>
+				<div id="window_data"></div>
+			</div>
+			<div id="mail" class="window">
+				<div id="titlebar"></div>
+				<div id="window_data"></div>
+			</div>
 	</div>
 </body>
 
