@@ -46,6 +46,7 @@ function isClone(username){
   return false
 }
 
+var startTime = (new Date).getTime()/1000;
 var registered = {};
 var unregistered = {};
 
@@ -72,6 +73,7 @@ io.sockets.on('connection', function (socket) {
       if (unregistered[data]){
         registered[data] = unregistered[data];
         token = data;
+        registered[data].startTime = startTime;
         socket.emit('tokenResponse',  registered[data])
         for (key in registered){
           socket.emit('get_positions', {token: registered[key].token, x: registered[key].x, y: registered[key].y, anim: registered[key].anim})
@@ -122,9 +124,13 @@ io.sockets.on('connection', function (socket) {
       }
     });
 
+    socket.on('clock', function(){
+      socket.emit();
+    });
+
   	socket.on('disconnect', function () {
-      console.log('disconnected: ' + token)
       if (registered[token] != null){
+        console.log('disconnected: ' + token)
         saveClient(registered[token], null);
         io.sockets.emit('disconnect', token);
         delete registered[token];

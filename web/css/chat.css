@@ -7,34 +7,30 @@ canvas {
 }
 
 #msg {
-	width:350px;
-	z-index:101; 
 	position:absolute; 
+	width:45%;
+	z-index:101; 
+	display: none;
+	border: none;
+	border-radius:2px;
 	bottom:5px; 
-	left:0px;
-	margin-left:20px;
-	padding: 5 5 5 5;
+	left:5px;
+	padding: 5px 10px 5px 5px;
 }
 
 #chatArea{
+	position: absolute;
 	display:none;
 	background:rgba(50,50,50,0.5);
-	border-radius: 3px;
+	border-radius: 2px;
 	padding: 5px 10px 5px 5px;
-	position: absolute;
-	bottom:50px;
-	left:0px;
-	margin-left:20px;
-	width:350px;
-	height:100px;
+	bottom:40px;
+	left:5px;
+	width:45%;
 }
 
 b {
 	color: lightblue;
-}
-
-#msg {
-	display: none;
 }
 
 textarea {

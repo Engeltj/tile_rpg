@@ -1,7 +1,7 @@
 var chatInit = function(){
   $('#chatArea').mCustomScrollbar({
     //set_width: 400,
-    set_height: 50,
+    set_height: 75,
     scrollButtons:{
       enable: false
     },

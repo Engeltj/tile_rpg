@@ -48,3 +48,7 @@ function httpGetData(theUrl) {
 	var responseText = httpGet(theUrl);
 	return JSON.parse(responseText);
 }
+
+function twoDigit(n){
+    return n > 9 ? "" + n: "0" + n;
+}

@@ -28,8 +28,8 @@
 			return false;
 		});
 		
-		if (sessionStorage.token)
-			window.location.href = "game.html";
+		// if (sessionStorage.token)
+		// 	window.location.href = "game.html";
 
 		var check = function(form) {
 			var hash = CryptoJS.SHA256(form.pwd.value).toString();

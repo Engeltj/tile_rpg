@@ -16,6 +16,8 @@ var circle;
 var opponents = {};
 var tileproperties = {};
 
+var startTime = 0;
+
 var cMap;
 var cLayers;
 var cTiles;
@@ -37,7 +39,7 @@ window.onload = function()
 	//init();
 	socketListeners()
 	socket.emit('setupToken', token)
-
+	
 }
 
 function init(){
@@ -79,6 +81,10 @@ function init(){
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", tick);
 	chatInit();
+	registerButtons();
+	window.setInterval(function(){
+		updateClock()
+	}, 1000);
 }
 
 
@@ -91,6 +97,8 @@ function socketListeners(){
 				setPlayerStart({x:18,y:20})
 			else
 				setPlayerStart(getIsoFromCartesian(data.position))
+			startTime = data.startTime;
+			updateClock();
 			initialized = true;
 		} else { 
 			delete sessionStorage.token
@@ -116,11 +124,31 @@ function socketListeners(){
     });
 
     socket.on('disconnect', function (data) {
-    	//map[2].removeChild(opponents[data]);
-    	delete opponents[data];
+    	if (opponents[data]){
+	    	opponents[data].visible = false;
+	    	delete opponents[data];
+	    }
     });
+}
+
+function updateClock(){
+	var time = (new Date).getTime()/1000 - startTime;
+	var days = Math.floor(time/60/24);
+	var hour = Math.floor(time/60) - days*24;
+	var minute = Math.floor(time) - days*60*24 - hour*60;
+	var e = document.getElementById('worldtime');
+	e.innerHTML = twoDigit(hour) + ':' + twoDigit(minute);
+}
 
 
+function registerButtons(){
+	document.getElementById("btn_mail").onclick = function(){
+		var opacity = document.getElementById("mail").style.opacity;
+		if (opacity == 100)
+			document.getElementById("mail").style.opacity = 0;
+		else
+			document.getElementById("mail").style.opacity = 100
+	};
 }
 
 function createPlayer(position){
@@ -388,6 +416,8 @@ function tick(event){
 				updatePlayerLayer(player);
 			}
 		}
+	} else {
+		player.gotoAndStop(player.currentAnimation)
 	}
 	stage.update();
 }

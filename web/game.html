@@ -21,9 +21,19 @@
 
 	<script>
 	  $(function() {
-	  	$(".window").resizable();
+	  	// $(".window").resizable();
 
-	    $(".window").draggable({ 
+	   //  $(".window").draggable({ 
+	   //  	containment: "#menubar",
+	   //  	handle: "#titlebar"
+	   //  });
+
+	   //  $(".menuitem").draggable({ 
+	   //  	containment: "#menubar",
+	   //  	handle: "#titlebar"
+	   //  });
+
+	    $("#mail").draggable({ 
 	    	containment: ".container",
 	    	handle: "#titlebar"
 	    });
@@ -40,8 +50,8 @@
 			<input id="msg" type="text"/>
 
 			<div id="infobar" class="dynamic">
-				<img src="img/clock.png" title="20:32" alt="worldtime"><p id="worldtime">20:32</p></img>
-				<img src="img/money.png" style="padding-left:20px"  alt="bits"><p id="bits">12351</p></img>
+				<img src="img/clock.png" title="20:32" alt="worldtime"><p id="worldtime">00:00</p></img>
+				<img src="img/money.png" style="padding-left:20px" alt="bits"><p id="bits">12351</p></img>
 			</div>
 
 			<div id="infobar" class="options">
@@ -50,18 +60,29 @@
 				<button id="btn_skills" class="btn btn-default"><img src="img/skills.png" alt="skills"/></button>
 			</div>
 
-			<div id="inventory" class="window">
-				<div id="titlebar"></div>
+
+			
+
+
+			<div id="mail">
+				<div id="titlebar">Mail</div>
 				<div id="window_data"></div>
-				<img id="test"></img>
 			</div>
-			<div id="skills" class="window">
-				<div id="titlebar"></div>
-				<div id="window_data"></div>
-			</div>
-			<div id="mail" class="window">
-				<div id="titlebar"></div>
-				<div id="window_data"></div>
+			<div id="menubar" class="window">
+				<div id="inventory" class="menuitem">
+					<div id="titlebar">Inventory</div>
+					<div id="window_data">
+							<div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div><div id="slot" name="1"></div>
+					</div>
+					<!-- <img id="test"></img> -->
+				</div>
+				<div id="skills" class="menuitem">
+					<div id="titlebar">Skills</div>
+					<div id="window_data">
+
+					</div>
+				</div>
+				
 			</div>
 	</div>
 </body>
